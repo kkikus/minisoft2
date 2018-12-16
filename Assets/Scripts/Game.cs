@@ -17,6 +17,7 @@ public class Game : MonoBehaviour {
     public GameObject FullCardMessage;
     public GameObject gameobj;
     public GameObject finalGameMessage;
+    public GameObject infoMessage;
     int[,] dataCarrot;
     int number;
     int indexAnimatorPanel;
@@ -384,6 +385,18 @@ public class Game : MonoBehaviour {
     public GameObject getFullCardMessages()
     {
         return FullCardMessage;
+    }
+
+    public void setActiveInfoPanel()
+    {
+        if (infoMessage.active)
+        {
+            infoMessage.SetActive(false);
+        }
+        else
+        {
+            infoMessage.SetActive(true);
+        }
     }
  
 
