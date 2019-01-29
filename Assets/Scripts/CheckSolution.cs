@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class CheckSolution : MonoBehaviour {
 
-    int[,] dataCarrot;
+    Dictionary<int, int[,]> data;
+    int[] priority;
     int indexCheckedCard;
     public GameObject gameobj;
     public GameObject UnncorrectSolution;
@@ -90,7 +91,8 @@ public class CheckSolution : MonoBehaviour {
         if (!startAnimate)
         {
             game = gameobj.GetComponent<Game>();
-            dataCarrot = game.getDataCarrot();
+            data = game.getData();
+            priority = game.getPriority();
             circlesPanel = findCirclesPanel();
             Tractor = getTractor();
             numberCircles = circlesPanel.childCount;
@@ -111,7 +113,7 @@ public class CheckSolution : MonoBehaviour {
         List<int> arr = new List<int>();
         for (int i = 0; i < numberCircles; i++)
         {
-            for (int j = 0; j < dataCarrot.GetLength(0); j++)
+       /*     for (int j = 0; j < dataCarrot.GetLength(0); j++)
             {
                 if (dataCarrot[j, 0] == i)
                 {
@@ -122,7 +124,7 @@ public class CheckSolution : MonoBehaviour {
                     arr.Add(0);
                     isThereCarrot = true;
                 }
-            }
+            }*/
             if (!isThereCarrot) {
                 arr.Add(0);
             }

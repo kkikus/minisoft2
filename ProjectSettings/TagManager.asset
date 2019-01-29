@@ -7,6 +7,9 @@ TagManager:
   - Slots
   - carrot
   - arrow
+  - tomato
+  - cucumber
+  - leftArrow
   layers:
   - Default
   - TransparentFX
