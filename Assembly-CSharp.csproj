@@ -55,6 +55,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\CheckSolution.cs" />
      <Compile Include="Assets\Scripts\DragHandeler.cs" />
+     <Compile Include="Assets\Scripts\DropdownCaption.cs" />
      <Compile Include="Assets\Scripts\DropFunction.cs" />
      <Compile Include="Assets\Scripts\Game.cs" />
      <Compile Include="Assets\Scripts\LoadScene.cs" />

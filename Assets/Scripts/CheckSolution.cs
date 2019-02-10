@@ -7,7 +7,6 @@ public class CheckSolution : MonoBehaviour {
 
     string[] result;
     string[] result2;
-    int[] priority; //ani prioriut a ani data dictionary uy netreba
     int indexCheckedCard;
     public GameObject gameobj;
     public GameObject UnncorrectSolution;
@@ -22,7 +21,6 @@ public class CheckSolution : MonoBehaviour {
     float time;
     int frameTractor;
     int krok;
-    List<int> resolution; //toto uz netreba
     int tractorPos;
 
 
@@ -109,7 +107,6 @@ public class CheckSolution : MonoBehaviour {
             game = gameobj.GetComponent<Game>();
             result = game.getResult();
             result2 = game.getResult2();
-            priority = game.getPriority();
             circlesPanel = findCirclesPanel();
             Tractor = getTractor();
             numberCircles = circlesPanel.childCount;

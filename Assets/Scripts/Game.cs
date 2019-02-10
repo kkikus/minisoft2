@@ -27,7 +27,6 @@ public class Game : MonoBehaviour {
     int indexAnimatorPanel;
     CheckSolution checkSolution;
     string textTask;
-    int[] priority;
     string[] result;
     string[] result2;
 
@@ -53,19 +52,24 @@ public class Game : MonoBehaviour {
             Resources.Load<Sprite>("cardTomato"),
             Resources.Load<Sprite>("cardCucumber")
         };
-        cardsPrefab = new GameObject[] {
+        cardsPrefab = getCardsPrefab();
+        data = null;
+        result = null;
+        result2 = null;
+        checkSolution = gameobj.GetComponent<CheckSolution>();
+        startGame();
+    }
+
+     GameObject[] getCardsPrefab()
+    {
+        GameObject[] cardsPrefab = new GameObject[] {
             (GameObject)Instantiate(Resources.Load("Prefabs/CardLeftArrowPrefab") as GameObject),
             (GameObject)Instantiate(Resources.Load("Prefabs/CardArrowPrefab") as GameObject),
             (GameObject)Instantiate(Resources.Load("Prefabs/CardCarrotPrefab") as GameObject),
             (GameObject)Instantiate(Resources.Load("Prefabs/CardTomatoPrefab") as GameObject),
             (GameObject)Instantiate(Resources.Load("Prefabs/CardCucumberPrefab") as GameObject)
         };
-        data = null;
-        priority = null;
-        result = null;
-        result2 = null;
-        checkSolution = gameobj.GetComponent<CheckSolution>();
-        startGame();
+        return cardsPrefab;
     }
 	
 
@@ -80,7 +84,6 @@ public class Game : MonoBehaviour {
             data.Add(0, new int[,] { { 1, 1 } });
             textTask = "Pozbieraj mrkvy a dostaň sa do domčeka.";
             result = new string[] {"arrow", "carrot", "arrow", "arrow"};
-            priority = new int[] { 0 };
         }
         else if (numberTask == 2)
         {
@@ -88,7 +91,6 @@ public class Game : MonoBehaviour {
             data.Add(0, new int[,] { { 1, 1 }, { 2, 1 } });
             textTask = "Pozbieraj mrkvy a dostaň sa do domčeka.";
             result = new string[] { "arrow", "carrot", "arrow", "carrot", "arrow" };
-            priority = new int[] { 0 };
         }
         else if (numberTask == 3)
         {
@@ -97,7 +99,6 @@ public class Game : MonoBehaviour {
             data.Add(1, new int[,] { { 2, 1 } });
             textTask = "Pozbieraj mrkvy, paradajky a dostaň sa do domčeka.";
             result = new string[] { "arrow", "carrot", "arrow", "tomato", "arrow" };
-            priority = new int[] { 0, 1 };
         }
         else if (numberTask == 4)
         {
@@ -106,7 +107,6 @@ public class Game : MonoBehaviour {
             data.Add(1, new int[,] { { 2, 2 } });
             textTask = "Najprv pozbieraj paradajky, potom mrkvy a dostaň sa do domčeka.";
             result = new string[] { "arrow", "arrow", "tomato", "leftArrow" ,"carrot", "arrow", "arrow", "arrow" };
-            priority = new int[] {1, 0};
         }
         else if (numberTask == 5)
         {
@@ -115,7 +115,6 @@ public class Game : MonoBehaviour {
             data.Add(0, new int[,] { { 2, 1 } });
             textTask = "Najprv pozbieraj mrkvy, potom paradajky a dostaň sa do domčeka.";
             result = new string[] { "arrow", "arrow", "carrot", "leftArrow", "tomato", "arrow", "arrow", "tomato", "arrow" };
-            priority = new int[] { 0, 1 };
         }
         else if(numberTask == 6)
         {
@@ -125,7 +124,6 @@ public class Game : MonoBehaviour {
             data.Add(2, new int[,] { { 3, 2 } });
             textTask = "Najprv pozbieraj mrkvy, potom paradajky a nakoniec uhorky a dostaň sa do domčeka.";
             result = new string[] { "arrow", "carrot", "arrow", "tomato", "arrow","cucumber", "arrow"};
-            priority = new int[] { 0, 1, 2 };
         }
         else if (numberTask == 7)
         {
@@ -135,7 +133,6 @@ public class Game : MonoBehaviour {
             data.Add(2, new int[,] { { 2, 1 } });
             textTask = "Najprv pozbieraj uhorky, potom paradajky a nakoniec mrkvy a dostaň sa do domčeka.";
             result = new string[] { "arrow", "arrow", "cucumber", "leftArrow", "tomato", "arrow", "arrow", "carrot","arrow", "arrow" };
-            priority = new int[] { 2, 1, 0 };
         }
         else if (numberTask == 8)
         {
@@ -148,7 +145,6 @@ public class Game : MonoBehaviour {
                 "leftArrow", "cucumber", "arrow", "arrow", "arrow", "arrow" };
             result2 = new string[] { "arrow", "arrow", "carrot", "arrow", "arrow", "tomato", "leftArrow", "leftArrow",
                 "leftArrow", "cucumber", "arrow", "arrow", "cucumber", "arrow", "arrow" };
-            priority = new int[] { 0, 1, 2 };
         }
         textLevel.text = "Úroveň " + numberTask;
         textMessage.text = textTask;
@@ -171,11 +167,6 @@ public class Game : MonoBehaviour {
     GameObject getPanelGame()
     {
         return GameObject.Find("PanelGame");
-    }
-
-    public int[] getPriority()
-    {
-        return priority;
     }
 
     void createBackgroundCirclesPanel(Dictionary<int, int[,]> data)
@@ -344,7 +335,11 @@ public class Game : MonoBehaviour {
                                 Vegetable.AddComponent<Image>();
                                 Vegetable.GetComponent<Image>().sprite = imageCucumber;
                             }
-                            Vegetable.transform.position = new Vector3(Vegetable.transform.position.x + k * 20, Vegetable.transform.position.y, 0);
+                            if (numberTask == 7 && item.Key == 1) {
+                                Vegetable.transform.position = new Vector3(Vegetable.transform.position.x + k * 20 - 60, Vegetable.transform.position.y, 0);
+                            }
+                            else
+                                Vegetable.transform.position = new Vector3(Vegetable.transform.position.x + k * 20, Vegetable.transform.position.y, 0);
                             Vegetable.transform.SetParent(childVegetablePanel.transform, false);
                         }
                     }
@@ -378,6 +373,7 @@ public class Game : MonoBehaviour {
         newCardsPanel.transform.SetParent(parentOfCardPanel.transform, false);
 
         //vytvorenie prikazov
+        cardsPrefab = getCardsPrefab();
         string[] nameCardsPanel = { "CardLeftArrowPanel", "CardArrowPanel", "CardCarrotPanel", "CardTomatoPanel", "CardCucumberPanel" };
         string[] tag = { "leftArrow", "arrow", "carrot", "tomato", "cucumber" };
         int count = numberTask < 3 ? 3 : numberTask < 6 ? 4 : 5;
@@ -423,6 +419,7 @@ public class Game : MonoBehaviour {
         {
             if (numberTask >= 8)
             {
+                textMessage.text = "";
                 finalGameMessage.SetActive(true);
             }
             else
@@ -438,6 +435,7 @@ public class Game : MonoBehaviour {
     {
         finalGameMessage.SetActive(false);
         numberTask = 1;
+        PlayerPrefs.SetInt("numberTask", 1);
         startGame();
     }
 

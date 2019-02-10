@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class LoadScene : MonoBehaviour {
@@ -12,7 +13,6 @@ public class LoadScene : MonoBehaviour {
             MainMenu();
         }
     }
-
     public void MainMenu()
     {
         SceneManager.LoadScene(0);
@@ -23,6 +23,7 @@ public class LoadScene : MonoBehaviour {
     }
     public void ExitGame()
     {
+        PlayerPrefs.DeleteKey("numberTask");
         Application.Quit();
     }
 }
