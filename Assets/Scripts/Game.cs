@@ -19,6 +19,8 @@ public class Game : MonoBehaviour {
     public GameObject FullCardMessage;
     public GameObject gameobj;
     public GameObject finalGameMessage;
+    public Text textMessage;
+    public Text textLevel;
     public Font font;
     Dictionary<int, int[,]> data;
     int number;
@@ -26,10 +28,17 @@ public class Game : MonoBehaviour {
     CheckSolution checkSolution;
     string textTask;
     int[] priority;
+    string[] result;
+    string[] result2;
 
     void Start ()
     {
-        numberTask = 1;
+        if (PlayerPrefs.HasKey("numberTask"))
+        {
+            numberTask = PlayerPrefs.GetInt("numberTask");
+        }
+        else
+            numberTask = 1;
         backgroundCirclesPanel = Resources.Load<Sprite>("backgroundForCircle");
         imageCircle = Resources.Load<Sprite>("circleForCard");
         imageMound = Resources.Load<Sprite>("mound");
@@ -53,6 +62,8 @@ public class Game : MonoBehaviour {
         };
         data = null;
         priority = null;
+        result = null;
+        result2 = null;
         checkSolution = gameobj.GetComponent<CheckSolution>();
         startGame();
     }
@@ -62,13 +73,13 @@ public class Game : MonoBehaviour {
     {
         // 0 - carrot, 1 - tomato, 2 - cucumber
         // data = { 1 : { {position, number}, {position, number}, {position, number}, .. }, 2: {{}, ..}}
-
-        var data = new Dictionary<int, int[,]>();
+        data = new Dictionary<int, int[,]>();
         if (numberTask == 1)
         {
             number = 3; // number of mounds
             data.Add(0, new int[,] { { 1, 1 } });
             textTask = "Pozbieraj mrkvy a dostaň sa do domčeka.";
+            result = new string[] {"arrow", "carrot", "arrow", "arrow"};
             priority = new int[] { 0 };
         }
         else if (numberTask == 2)
@@ -76,6 +87,7 @@ public class Game : MonoBehaviour {
             number = 3;
             data.Add(0, new int[,] { { 1, 1 }, { 2, 1 } });
             textTask = "Pozbieraj mrkvy a dostaň sa do domčeka.";
+            result = new string[] { "arrow", "carrot", "arrow", "carrot", "arrow" };
             priority = new int[] { 0 };
         }
         else if (numberTask == 3)
@@ -84,6 +96,7 @@ public class Game : MonoBehaviour {
             data.Add(0, new int[,] { { 1, 2 }});
             data.Add(1, new int[,] { { 2, 1 } });
             textTask = "Pozbieraj mrkvy, paradajky a dostaň sa do domčeka.";
+            result = new string[] { "arrow", "carrot", "arrow", "tomato", "arrow" };
             priority = new int[] { 0, 1 };
         }
         else if (numberTask == 4)
@@ -92,6 +105,7 @@ public class Game : MonoBehaviour {
             data.Add(0, new int[,] { { 1, 1 } });
             data.Add(1, new int[,] { { 2, 2 } });
             textTask = "Najprv pozbieraj paradajky, potom mrkvy a dostaň sa do domčeka.";
+            result = new string[] { "arrow", "arrow", "tomato", "leftArrow" ,"carrot", "arrow", "arrow", "arrow" };
             priority = new int[] {1, 0};
         }
         else if (numberTask == 5)
@@ -100,6 +114,7 @@ public class Game : MonoBehaviour {
             data.Add(1, new int[,] { { 1, 1 }, {3, 1} });
             data.Add(0, new int[,] { { 2, 1 } });
             textTask = "Najprv pozbieraj mrkvy, potom paradajky a dostaň sa do domčeka.";
+            result = new string[] { "arrow", "arrow", "carrot", "leftArrow", "tomato", "arrow", "arrow", "tomato", "arrow" };
             priority = new int[] { 0, 1 };
         }
         else if(numberTask == 6)
@@ -109,6 +124,7 @@ public class Game : MonoBehaviour {
             data.Add(1, new int[,] { { 2, 1 } });
             data.Add(2, new int[,] { { 3, 2 } });
             textTask = "Najprv pozbieraj mrkvy, potom paradajky a nakoniec uhorky a dostaň sa do domčeka.";
+            result = new string[] { "arrow", "carrot", "arrow", "tomato", "arrow","cucumber", "arrow"};
             priority = new int[] { 0, 1, 2 };
         }
         else if (numberTask == 7)
@@ -118,6 +134,7 @@ public class Game : MonoBehaviour {
             data.Add(1, new int[,] { { 1, 3 } });
             data.Add(2, new int[,] { { 2, 1 } });
             textTask = "Najprv pozbieraj uhorky, potom paradajky a nakoniec mrkvy a dostaň sa do domčeka.";
+            result = new string[] { "arrow", "arrow", "cucumber", "leftArrow", "tomato", "arrow", "arrow", "carrot","arrow", "arrow" };
             priority = new int[] { 2, 1, 0 };
         }
         else if (numberTask == 8)
@@ -127,29 +144,28 @@ public class Game : MonoBehaviour {
             data.Add(1, new int[,] { { 4, 2 } });
             data.Add(2, new int[,] { { 1, 1 }, { 3, 1 } });
             textTask = "Najprv pozbieraj mrkvy, potom paradajky a nakoniec uhorky a dostaň sa do domčeka.";
+            result = new string[] { "arrow", "arrow", "carrot", "arrow", "arrow", "tomato", "leftArrow", "cucumber", "leftArrow",
+                "leftArrow", "cucumber", "arrow", "arrow", "arrow", "arrow" };
+            result2 = new string[] { "arrow", "arrow", "carrot", "arrow", "arrow", "tomato", "leftArrow", "leftArrow",
+                "leftArrow", "cucumber", "arrow", "arrow", "cucumber", "arrow", "arrow" };
             priority = new int[] { 0, 1, 2 };
         }
-        createText(textTask);
+        textLevel.text = "Úroveň " + numberTask;
+        textMessage.text = textTask;
         createMounds(number, data);
-        createBackgroundCirclesPanel(number, data);
+        createBackgroundCirclesPanel(data);
         createVegetablePanel(data);
         createCardPanel();
     }
 
-    public Dictionary<int, int[,]> getData()
+    public string[] getResult()
     {
-        return data;
+        return result;
     }
 
-    int getNumberVegetablesMound(Dictionary<int, int[,]> data)
+    public string[] getResult2()
     {
-        int number = 0; int i = 0;
-        foreach (var item in data)
-        {
-            number += item.Value.GetLength(i);
-            i++;
-        }
-        return number;
+        return result2;
     }
 
     GameObject getPanelGame()
@@ -162,27 +178,10 @@ public class Game : MonoBehaviour {
         return priority;
     }
 
-    void createText(string Text)
-    {
-        GameObject panelGame = getPanelGame();
-        GameObject textObject = new GameObject();
-        textObject.name = "TextTask";
-        textObject.AddComponent<Text>();
-        textObject.GetComponent<Text>().text = Text;
-        textObject.GetComponent<Text>().fontSize = 40;
-        textObject.GetComponent<Text>().font = font;
-        textObject.GetComponent<Text>().fontStyle = FontStyle.Bold;
-        textObject.GetComponent<Text>().color = Color.black;
-        textObject.GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
-        textObject.transform.position = new Vector3(0, 70, 0);
-        textObject.GetComponent<RectTransform>().sizeDelta = new Vector2(1300, 50);
-        textObject.transform.SetParent(panelGame.transform, false);
-    }
-
-    void createBackgroundCirclesPanel(int numberCard, Dictionary<int, int[,]> data)
+    void createBackgroundCirclesPanel(Dictionary<int, int[,]> data)
     {
         GameObject parentOfCirclesPanel = getPanelGame();
-        int numberVegetablesMound = getNumberVegetablesMound(data);
+        int numberVegetablesMound = result.Length;
 
         GameObject newBackgroundCirclesPanel = new GameObject();
         newBackgroundCirclesPanel.name = "CirclesPanel";
@@ -191,7 +190,7 @@ public class Game : MonoBehaviour {
         newBackgroundCirclesPanel.transform.position = new Vector3(0, 195, 0);
 
         RectTransform circlesPanelRectTransform = newBackgroundCirclesPanel.GetComponent<RectTransform>();
-        int width = (numberCard + numberVegetablesMound) * 110 + 50;
+        int width = (numberVegetablesMound) * 110 + 50;
         circlesPanelRectTransform.sizeDelta = new Vector2(width , 168);
 
         newBackgroundCirclesPanel.AddComponent<GridLayoutGroup>();
@@ -204,7 +203,7 @@ public class Game : MonoBehaviour {
 
         newBackgroundCirclesPanel.transform.SetParent(parentOfCirclesPanel.transform, false);
 
-        createCirclesPanel(numberCard + numberVegetablesMound, newBackgroundCirclesPanel.transform);
+        createCirclesPanel(numberVegetablesMound, newBackgroundCirclesPanel.transform);
     }
 
     private void createCirclesPanel(int numberCard, Transform parent)
@@ -314,37 +313,43 @@ public class Game : MonoBehaviour {
             childVegetablePanel.AddComponent<Image>();
             childVegetablePanel.GetComponent<Image>().color = new Color32(255, 255, 225, 0);
             childVegetablePanel.transform.SetParent(parent,false);
-            int j = 0;
             foreach (var item in data)
             {
-                if (item.Value[j,0] == i)
+                int j = 0;
+                while (j < item.Value.GetLength(0))
                 {
-                    for (int k = 0; k < item.Value[j, 1]; k++)
+                    if (item.Value[j, 0] == i)
                     {
-                        GameObject Vegetable = new GameObject();
-                        if (item.Key == 0)
+                        for (int k = 0; k < item.Value[j, 1]; k++)
                         {
-                            Vegetable.name = "Carrot" + k;
-                            Vegetable.AddComponent<Image>();
-                            Vegetable.GetComponent<Image>().sprite = imageCarrot;
+                            GameObject Vegetable = new GameObject();
+                            if (item.Key == 0)
+                            {
+                                Vegetable.name = "Carrot" + k;
+                                Vegetable.transform.tag = "carrot";
+                                Vegetable.AddComponent<Image>();
+                                Vegetable.GetComponent<Image>().sprite = imageCarrot;
+                            }
+                            else if (item.Key == 1)
+                            {
+                                Vegetable.name = "Tomato" + k;
+                                Vegetable.transform.tag = "tomato";
+                                Vegetable.AddComponent<Image>();
+                                Vegetable.GetComponent<Image>().sprite = imageTomato;
+                            }
+                            else
+                            {
+                                Vegetable.name = "Cucumber" + k;
+                                Vegetable.transform.tag = "cucumber";
+                                Vegetable.AddComponent<Image>();
+                                Vegetable.GetComponent<Image>().sprite = imageCucumber;
+                            }
+                            Vegetable.transform.position = new Vector3(Vegetable.transform.position.x + k * 20, Vegetable.transform.position.y, 0);
+                            Vegetable.transform.SetParent(childVegetablePanel.transform, false);
                         }
-                        else if (item.Key == 1)
-                        {
-                            Vegetable.name = "Tomato" + k;
-                            Vegetable.AddComponent<Image>();
-                            Vegetable.GetComponent<Image>().sprite = imageTomato;
-                        }
-                        else
-                        {
-                            Vegetable.name = "Cucumber" + k;
-                            Vegetable.AddComponent<Image>();
-                            Vegetable.GetComponent<Image>().sprite = imageCucumber;
-                        }
-                        Vegetable.transform.position = new Vector3(Vegetable.transform.position.x + k * 20, Vegetable.transform.position.y, 0);
-                        Vegetable.transform.SetParent(childVegetablePanel.transform, false);
                     }
-                }
-                j++;    
+                    j++;
+                } 
             }
         }
 
@@ -416,13 +421,14 @@ public class Game : MonoBehaviour {
         }
         else
         {
-            if (numberTask > 8)
+            if (numberTask >= 8)
             {
                 finalGameMessage.SetActive(true);
             }
             else
             {
                 numberTask++;
+                PlayerPrefs.SetInt("numberTask", numberTask);
                 startGame();
             }
         }

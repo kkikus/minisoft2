@@ -5,8 +5,9 @@ using UnityEngine.UI;
 
 public class CheckSolution : MonoBehaviour {
 
-    Dictionary<int, int[,]> data;
-    int[] priority;
+    string[] result;
+    string[] result2;
+    int[] priority; //ani prioriut a ani data dictionary uy netreba
     int indexCheckedCard;
     public GameObject gameobj;
     public GameObject UnncorrectSolution;
@@ -21,7 +22,7 @@ public class CheckSolution : MonoBehaviour {
     float time;
     int frameTractor;
     int krok;
-    List<int> resolution;
+    List<int> resolution; //toto uz netreba
     int tractorPos;
 
 
@@ -39,42 +40,57 @@ public class CheckSolution : MonoBehaviour {
             {
                 circlesPanel.GetChild(index).transform.GetChild(0).gameObject.GetComponent<Image>().color = new Color32(115, 180, 121, 225);
                 Transform prefabCard = circlesPanel.GetChild(index).transform.GetChild(0);
-
-                if ((prefabCard.tag == "arrow" && resolution[index] == 1) || (prefabCard.tag == "carrot" && resolution[index] == 0))
+                if ((prefabCard.tag != result[index] && result2 == null) || (prefabCard.tag != result[index] && result2 != null && prefabCard.tag != result2[index]))
+                {
                     isCorrect = false;
+                }
 
-                if (prefabCard.tag == "arrow")
+                if (prefabCard.tag == "arrow" || prefabCard.tag == "leftArrow")
                 {
                     time -= Time.deltaTime;
                     if (time < 0)
-                        {             
+                    {             
                         if (krok < frameTractor)
                         {
-                            Tractor.transform.position = new Vector3(Tractor.transform.position.x + (getLengthX()), Tractor.transform.position.y,Tractor.transform.position.z);
+                            if(prefabCard.tag == "arrow")
+                                Tractor.transform.position = new Vector3(Tractor.transform.position.x + (getLengthX()), Tractor.transform.position.y, Tractor.transform.position.z);
+                            else
+                                Tractor.transform.position = new Vector3(Tractor.transform.position.x - (getLengthX()), Tractor.transform.position.y, Tractor.transform.position.z);
                             krok++;
                         }
                         else
                         {
                             index++;
-                            tractorPos++;
+                            if (prefabCard.tag == "arrow")
+                                tractorPos++;
+                            else
+                                tractorPos--;
                             krok = 0;
                         }
                         time = 0.5f;
                     }
 
                 }
-                else if(prefabCard.tag == "carrot")
+                else
                 {
-                    time -= Time.deltaTime;
-                    if (time < 0)
+                    if (tractorPos > 0 && tractorPos < GameObject.Find("VegetablePanel").transform.childCount)
                     {
-                        if (GameObject.Find("CarrotPanel").transform.GetChild(tractorPos).transform.childCount > 0)
+                        Transform vegetable = GameObject.Find("VegetablePanel").transform.GetChild(tractorPos).transform;
+                        time -= Time.deltaTime;
+                        if (time < 0)
                         {
-                            Destroy(GameObject.Find("CarrotPanel").transform.GetChild(tractorPos).transform.GetChild(0).gameObject);
+                            if (vegetable.childCount > 0 && vegetable.GetChild(0).tag == prefabCard.tag)
+                            {
+                                for (int i = 0; i < vegetable.childCount; i++)
+                                {
+                                    Destroy(vegetable.GetChild(i).gameObject);
+                                }
+                            }
+                            index++;
+                            time = 0.5f;
                         }
-                        index++;
-                        time = 0.5f;
                     }
+                    else { index++; }   
                 }
             }
             else
@@ -91,7 +107,8 @@ public class CheckSolution : MonoBehaviour {
         if (!startAnimate)
         {
             game = gameobj.GetComponent<Game>();
-            data = game.getData();
+            result = game.getResult();
+            result2 = game.getResult2();
             priority = game.getPriority();
             circlesPanel = findCirclesPanel();
             Tractor = getTractor();
@@ -102,42 +119,12 @@ public class CheckSolution : MonoBehaviour {
             krok = 0;
             frameTractor = 2;
             tractorPos = 0;
-            resolution = getResolution();
             startAnimate = true;
         }
     }
 
-    List<int> getResolution()
-    {
-        bool isThereCarrot = false;
-        List<int> arr = new List<int>();
-        for (int i = 0; i < numberCircles; i++)
-        {
-       /*     for (int j = 0; j < dataCarrot.GetLength(0); j++)
-            {
-                if (dataCarrot[j, 0] == i)
-                {
-                    for (int k = 0; k < dataCarrot[j, 1]; k++)
-                    {
-                        arr.Add(1);
-                    }
-                    arr.Add(0);
-                    isThereCarrot = true;
-                }
-            }*/
-            if (!isThereCarrot) {
-                arr.Add(0);
-            }
-            isThereCarrot = false;
-            if (arr.Count == numberCircles)
-                return arr;
-        }
-        return arr;
-    }
-
     void checkAndShowMessage()
     {
-        resolution.Clear();
         if (!isCorrect)
         {
             UnncorrectSolution.SetActive(true);
@@ -157,7 +144,7 @@ public class CheckSolution : MonoBehaviour {
         deleteTractor();
         deleteCirclesPanel();
         deleteMoundPanel();
-        deleteCarrotPanel();
+        deleteVegetablePanel();
         game.startGame();
     }
 
@@ -168,7 +155,7 @@ public class CheckSolution : MonoBehaviour {
         deleteTractor();
         deleteCirclesPanel();
         deleteMoundPanel();
-        deleteCarrotPanel();
+        deleteVegetablePanel();
         game.checkIsNextTask(1);
     }
 
@@ -189,7 +176,7 @@ public class CheckSolution : MonoBehaviour {
         go.SetActive(false);
         setDefaultColor();
         deleteTractor();
-        deleteCarrotPanel();
+        deleteVegetablePanel();
         game.checkIsNextTask(0);
     }
 
@@ -219,9 +206,9 @@ public class CheckSolution : MonoBehaviour {
         Destroy(GameObject.Find("MoundPanel"));
     }
 
-    static void deleteCarrotPanel()
+    static void deleteVegetablePanel()
     {
-        Destroy(GameObject.Find("CarrotPanel"));
+        Destroy(GameObject.Find("VegetablePanel"));
     }
 
     static Transform findCirclesPanel()
